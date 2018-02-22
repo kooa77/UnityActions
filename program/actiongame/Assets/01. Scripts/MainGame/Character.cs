@@ -4,12 +4,20 @@ using UnityEngine;
 
 public class Character : MonoBehaviour
 {
+    public enum eCharacterType
+    {
+        NONE,
+        PLAYER,
+        MONSTER,
+    }
+    protected eCharacterType _characterType = eCharacterType.NONE;
+
     public GameObject CharacterVisual;
 
     // Use this for initialization
     void Start ()
     {
-        InitState();
+        Init();
     }
 	
 	// Update is called once per frame
@@ -25,12 +33,29 @@ public class Character : MonoBehaviour
     }
 
 
+    // Type
+
+    virtual public void Init()
+    {
+        InitAttackInfo();
+        InitDamageInfo();
+        InitState();
+    }
+
+    public eCharacterType GetCharacterType()
+    {
+        return _characterType;
+    }
+
+
     // State
 
     public enum eState
     {
         IDLE,
         MOVE,
+        ATTACK,
+        CHASE,
     }
     protected eState _stateType = eState.IDLE;
     eState _nextStateType = eState.IDLE;
@@ -41,12 +66,18 @@ public class Character : MonoBehaviour
     {
         State idleState = new IdleState();
         State moveState = new MoveState();
+        State attackState = new AttackState();
+        State chaseSate = new ChaseState();
 
         idleState.Init(this);
         moveState.Init(this);
+        attackState.Init(this);
+        chaseSate.Init(this);
 
         _stateList.Add(eState.IDLE, idleState);
         _stateList.Add(eState.MOVE, moveState);
+        _stateList.Add(eState.ATTACK, attackState);
+        _stateList.Add(eState.CHASE, chaseSate);
     }
 
     public void ChangeState(eState stateType)
@@ -100,10 +131,49 @@ public class Character : MonoBehaviour
     }
 
 
+    // Attack
+
+    AttackArea[] _attackAreas;
+
+    void InitAttackInfo()
+    {
+        _attackAreas = GetComponentsInChildren<AttackArea>();
+    }
+
+    public void AttackStart()
+    {
+        for (int i = 0; i < _attackAreas.Length; i++)
+            _attackAreas[i].Enable();
+    }
+
+    public void AttackEnd()
+    {
+        for (int i = 0; i < _attackAreas.Length; i++)
+            _attackAreas[i].Disable();
+    }
+
+
+    // Damage Info
+
+    void InitDamageInfo()
+    {
+        HitArea[] hitAreas = GetComponentsInChildren<HitArea>();
+        for(int i=0; i< hitAreas.Length; i++)
+        {
+            hitAreas[i].Init(this);
+        }
+    }
+
+
     // Animation
 
     public void SetAnimationTrigger(string triggerName)
     {
         CharacterVisual.GetComponent<Animator>().SetTrigger(triggerName);
+    }
+
+    public AnimationPlayer GetAnimationPlayer()
+    {
+        return CharacterVisual.GetComponent<AnimationPlayer>();
     }
 }

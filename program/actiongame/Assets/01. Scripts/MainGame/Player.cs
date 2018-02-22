@@ -4,7 +4,11 @@ using UnityEngine;
 
 public class Player : Character
 {
-    // Unity Functions
+    override public void Init()
+    {
+        base.Init();
+        _characterType = eCharacterType.PLAYER;
+    }
 
     override public void UpdateCharacter()
     {
@@ -19,11 +23,32 @@ public class Player : Character
             Vector3 mousePosition = InputManager.Instance.GetCursorPosition();
             Ray ray = Camera.main.ScreenPointToRay(mousePosition);
             RaycastHit hitInfo;
-            if (Physics.Raycast(ray, out hitInfo, 100.0f, 1 << LayerMask.NameToLayer("Ground")))
+            LayerMask layerMask = (1 << LayerMask.NameToLayer("Ground")) |
+                                (1 << LayerMask.NameToLayer("Character"));
+            if (Physics.Raycast(ray, out hitInfo, 100.0f, layerMask))
             {
-                _targetPosition = hitInfo.point;
-                _stateList[_stateType].UpdateInput();
+                if( LayerMask.NameToLayer("Ground") == hitInfo.collider.gameObject.layer )
+                {
+                    _targetPosition = hitInfo.point;
+                    _stateList[_stateType].UpdateInput();
+                }
+                else if (LayerMask.NameToLayer("Character") == hitInfo.collider.gameObject.layer)
+                {
+                    HitArea hitArea = hitInfo.collider.gameObject.GetComponent<HitArea>();
+                    Character character = hitArea.GetCharacter();
+                    switch (character.GetCharacterType())
+                    {
+                        case eCharacterType.MONSTER:
+                            _targetPosition = hitInfo.collider.gameObject.transform.position;
+                            ChangeState(eState.CHASE);
+                            break;
+                    }
+                }
             }
+        }
+        if(InputManager.Instance.IsAttackButtonDown())
+        {
+            ChangeState(eState.ATTACK);
         }
     }
 }
