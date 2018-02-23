@@ -9,4 +9,12 @@ public class Monster : Character
         base.Init();
         _characterType = eCharacterType.MONSTER;
     }
+
+    protected override void InitState()
+    {
+        base.InitState();
+
+        State idleState = new WargIdleState();
+        _stateList[eState.IDLE] = idleState;
+    }
 }

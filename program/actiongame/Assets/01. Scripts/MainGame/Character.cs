@@ -62,7 +62,7 @@ public class Character : MonoBehaviour
 
     protected Dictionary<eState, State> _stateList = new Dictionary<eState, State>();
 
-    void InitState()
+    virtual protected void InitState()
     {
         State idleState = new IdleState();
         State moveState = new MoveState();
@@ -92,6 +92,19 @@ public class Character : MonoBehaviour
             _stateType = _nextStateType;
             _stateList[_stateType].Start();
         }
+    }
+
+
+    // Idle
+
+    public float GetRefreshTime()
+    {
+        return 2.0f;
+    }
+
+    public void Patrol()
+    {
+        ChangeState(eState.PATROL);
     }
 
 
