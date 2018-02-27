@@ -56,6 +56,7 @@ public class Character : MonoBehaviour
         MOVE,
         ATTACK,
         CHASE,
+        PATROL,
     }
     protected eState _stateType = eState.IDLE;
     eState _nextStateType = eState.IDLE;
@@ -68,16 +69,19 @@ public class Character : MonoBehaviour
         State moveState = new MoveState();
         State attackState = new AttackState();
         State chaseSate = new ChaseState();
+        State patrolState = new PatrolState();
 
         idleState.Init(this);
         moveState.Init(this);
         attackState.Init(this);
         chaseSate.Init(this);
+        patrolState.Init(this);
 
         _stateList.Add(eState.IDLE, idleState);
         _stateList.Add(eState.MOVE, moveState);
         _stateList.Add(eState.ATTACK, attackState);
         _stateList.Add(eState.CHASE, chaseSate);
+        _stateList.Add(eState.PATROL, patrolState);
     }
 
     public void ChangeState(eState stateType)
@@ -90,7 +94,10 @@ public class Character : MonoBehaviour
         if (_nextStateType != _stateType)
         {
             _stateType = _nextStateType;
-            _stateList[_stateType].Start();
+            if (_stateList.ContainsKey(_stateType))
+                _stateList[_stateType].Start();
+            else
+                Debug.LogError("Can't find state " + _stateType + " of " + gameObject.name);
         }
     }
 
@@ -111,6 +118,7 @@ public class Character : MonoBehaviour
     // Move
 
     protected Vector3 _targetPosition = Vector3.zero;
+    protected GameObject _targetObject = null;
 
     public Vector3 GetPosition()
     {
@@ -120,6 +128,16 @@ public class Character : MonoBehaviour
     public Vector3 GetTargetPosition()
     {
         return _targetPosition;
+    }
+
+    public GameObject GetTargetObject()
+    {
+        return _targetObject;
+    }
+
+    virtual public void ArriveDestination()
+    {
+        ChangeState(Player.eState.IDLE);
     }
 
     public bool IsGround()
@@ -143,7 +161,7 @@ public class Character : MonoBehaviour
         gameObject.GetComponent<CharacterController>().Move(velocity);
     }
 
-
+    
     // Attack
 
     AttackArea[] _attackAreas;
@@ -163,6 +181,11 @@ public class Character : MonoBehaviour
     {
         for (int i = 0; i < _attackAreas.Length; i++)
             _attackAreas[i].Disable();
+    }
+
+    public float GetAttackRange()
+    {
+        return 1.5f;
     }
 
 

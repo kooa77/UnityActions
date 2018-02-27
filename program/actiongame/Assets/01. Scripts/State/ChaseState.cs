@@ -17,7 +17,8 @@ public class ChaseState : State
 
     override public void Update()
     {
-        Vector3 destination = _character.GetTargetPosition();
+        //Vector3 destination = _character.GetTargetPosition();
+        Vector3 destination = _character.GetTargetObject().transform.position;
 
         destination.y = _character.GetPosition().y;
         Vector3 direction = (destination - _character.GetPosition()).normalized;
@@ -29,7 +30,7 @@ public class ChaseState : State
 
         // 목적지와 현재 위치가 일정 거리 이상이면 -> 이동
         float distance = Vector3.Distance(destination, _character.GetPosition());
-        if( distance < 1.5f )
+        if (distance < _character.GetAttackRange())
         {
             _character.ChangeState(Player.eState.ATTACK);
         }

@@ -2,20 +2,16 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class MoveState : State
+public class PatrolState : State
 {
     Vector3 _destination;
     Vector3 _velocity = Vector3.zero;
 
     override public void Start()
     {
+        _character.ArriveDestination();
         _destination = _character.GetTargetPosition();
-        float distance = Vector3.Distance(_destination, _character.GetPosition());
         _character.SetAnimationTrigger("move");
-    }
-
-    override public void Stop()
-    {
     }
 
     override public void Update()
@@ -38,11 +34,7 @@ public class MoveState : State
         else
         {
             _character.ArriveDestination();
+            _destination = _character.GetTargetPosition();
         }
-    }
-
-    override public void UpdateInput()
-    {
-        _destination = _character.GetTargetPosition();
     }
 }

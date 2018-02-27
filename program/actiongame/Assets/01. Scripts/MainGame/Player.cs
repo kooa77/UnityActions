@@ -39,7 +39,8 @@ public class Player : Character
                     switch (character.GetCharacterType())
                     {
                         case eCharacterType.MONSTER:
-                            _targetPosition = hitInfo.collider.gameObject.transform.position;
+                            //_targetPosition = hitInfo.collider.gameObject.transform.position;
+                            _targetObject = hitInfo.collider.gameObject;
                             ChangeState(eState.CHASE);
                             break;
                     }
